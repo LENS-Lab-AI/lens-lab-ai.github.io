@@ -1,7 +1,5 @@
----
-layout: default
-title: Expressivity Arena
----
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -29,7 +27,7 @@ title: Expressivity Arena
         }
         h1 {
             color: #ffffff;
-        } 
+        }
         h2 {
             color: #4a90e2;
         }
@@ -56,20 +54,33 @@ title: Expressivity Arena
             color: #555;
             background: #f2f2f2;
         }
+        pre {
+            background: #f9f9f9;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            overflow-x: auto;
+        }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1>ExpressivityArena: Can LLMs Express Information Implicitly?</h1>
-        <p>Joshua Tint, Som Sagar, Aditya Taparia, Kelly Raines, Bimsara Pathiraja, Caleb Liu, Ransalu Senanayake</p>
+<div class="header">
+    <h1>ExpressivityArena: Can LLMs Express Information Implicitly?</h1>
+    <p>Joshua Tint, Som Sagar, Aditya Taparia, Kelly Raines, Bimsara Pathiraja, Caleb Liu, Ransalu Senanayake</p>
     <a href="/assets/expressivityarena.pdf" download="ExpressivityArena_Paper.pdf">
-            <button style="background-color:#4a90e2; color:white; padding:10px 20px; border:none; border-radius:5px; cursor:pointer;">
+        <button style="background-color:#4a90e2; color:white; padding:10px 20px; border:none; border-radius:5px; cursor:pointer;">
             Download Paper
         </button>
     </a>
+</div>
 
-    </div>
+<div class="content">
+    <section class="introduction">
+        <h2>Abstract</h2>
+        <p>While Large Language Models (LLMs) have demonstrated remarkable performance in cer- tain dimensions, their ability to express implicit language cues that human use for effective communication remains unclear. This paper presents ExpressivityArena, a Python library for measuring the implicit communication abil- ities of LLMs. We provide a comprehensive framework to evaluate expressivity of arbitrary LLMs and explore its practical implications. To this end, we refine the definition and mea- surements of “expressivity,” and use our frame- work in a set of small experiments. These experiments test LLMs in creative and logi- cal tasks such as poetry, coding, and emotion- based responses. They are then evaluated by an automated grader, through ExpressivityArena, which we verify to be the most pragmatic for testing expressivity. Building on these exper- iments, we deepen our understanding of the expressivity of LLMs by assessing their abil- ity to remain expressive in conversations. Our findings indicate that LLMs are capable of gen- erating and understanding expressive content, however, with some limitations. These insights will inform the future development and deploy- ment of expressive LLMs. We provide the code for ExpressivityArena alongside our paper.</p>
+    </section>
+
 
     <div class="content">
         <section class="key-features">
@@ -98,25 +109,106 @@ title: Expressivity Arena
             </div>
         </section>
 
-        <section class="citation">
-            <h2>Reference</h2>
-            <p>Joshua Tint, Som Sagar, Aditya Taparia, Kelly Raines, Bimsara Pathiraja, Caleb Liu, Ransalu Senanayake. "<em>ExpressivityArena: Can LLMs Express Information Implicitly?</em>" In Proceedings of NAACL 2024. <br><br>
+    <section class="components">
+        <h2>Components</h2>
+        <div class="feature-item">
+            <strong>LLM (Language Model):</strong>
+            <p>The <code>LLM</code> class represents the functionality of a Language Model.</p>
+            <ul>
+                <li><code>name</code>: The name of the LLM for identification purposes.</li>
+                <li><code>get_response</code>: A function representing the prompt -> response functionality of the LLM.</li>
+            </ul>
+        </div>
+        <div class="feature-item">
+            <strong>ExpressivityPrompt:</strong>
+            <p>The <code>ExpressivityPrompt</code> class encapsulates a prompt to produce a response conveying a particular signal in a specific context.</p>
+            <ul>
+                <li><code>instruction</code>: The type of response to generate, such as "poem," "speech," or "Python program."</li>
+                <li><code>expressivity_signal</code>: The signal to encode into the response, such as "sad," "secretive," or "well-educated."</li>
+            </ul>
+        </div>
+        <div class="feature-item">
+            <strong>ExpressivityResult:</strong>
+            <p>The <code>ExpressivityResult</code> class represents the result of an ExpressivityArena experiment.</p>
+            <ul>
+                <li><code>LLM</code>: The LLM used for the experiment.</li>
+                <li><code>prompt</code>: The prompt used for the experiment.</li>
+                <li><code>result</code>: The response the LLM gave for the prompt.</li>
+                <li><code>grade</code>: A boolean indicating whether the response effectively expressed the signal.</li>
+            </ul>
+        </div>
+        <div class="feature-item">
+            <strong>Grader:</strong>
+            <p>The <code>Grader</code> class is a GPT-3.5-powered system for grading whether responses express a given signal or not.</p>
+        </div>
+    </section>
+
+    <section class="usage">
+        <h2>Usage</h2>
+        <h3>Evaluation</h3>
+        <p>The <code>evaluate</code> function evaluates an ExpressivityArena prompt to produce an expressive result and then grades the expressivity of that response.</p>
+        <pre>
+evaluate(llm: LLM, grader: Grader, prompt: ExpressivityPrompt) -> ExpressivityResult
+            </pre>
+
+        <h3>Batch Evaluation</h3>
+        <p>The <code>batch_evaluate</code> function returns a list of ExpressivityArena experiment results for a list of prompts.</p>
+        <pre>
+evaluate(llm: LLM, grader: Grader, prompts: List[ExpressivityPrompt]) -> List[ExpressivityResult]
+            </pre>
+    </section>
+
+    <section class="example">
+        <h2>Example</h2>
+        <pre>
+from arena import evaluate_category
+from context import SignalCategory
+from grader import MultipleChoiceGrader
+from llm import LLM
+
+# Initialize LLM and Grader
+def gpt_response_function(prompt: str):
+    # Fetch a response for the given prompt from the GPT API...
+    return response
+
+llm = LLM(name="GPT", get_response=gpt_response_function)
+grader = MultipleChoiceGrader(llm)
+
+# Define signals
+genres_category = SignalCategory("genres", [
+        "horror", "romance", "thriller", "comedy", "drama"
+])
+
+# Evaluate prompts
+results = evaluate_category(llm, grader, "short story", genres_category)
+
+# Process results
+for result in results:
+    print(f"Prompt: {result.prompt}")
+    print(f"Result: {result.result}")
+    print(f"Grade: {'Expressive' if result.grade else 'Not Expressive'}")
+    print()
+            </pre>
+    </section>
+
+    <section class="citation">
+        <h2>Reference</h2>
+        <p>Joshua Tint, Som Sagar, Aditya Taparia, Kelly Raines, Bimsara Pathiraja, Caleb Liu, Ransalu Senanayake. "<em>ExpressivityArena: Can LLMs Express Information Implicitly?</em>" In Proceedings of NAACL 2024. <br><br>
             BibTeX Citation:
-            <pre>
-@inproceedings{Tint2024ExpressivityArena,
+        <pre>
+@misc{Tint2024ExpressivityArena,
     author = {Joshua Tint and Som Sagar and Aditya Taparia and Kelly Raines and Bimsara Pathiraja and Caleb Liu and Ransalu Senanayake},
     title = {ExpressivityArena: Can LLMs Express Information Implicitly?},
-    booktitle = {Proceedings of the 2024 North American Chapter of the Association for Computational Linguistics (NAACL)},
     year = {2024}
 }
             </pre>
-            </p>
-        </section>
-    </div>
+        </p>
+    </section>
+</div>
 
-    <footer>
-        &copy; 2024 ExpressivityArena. All rights reserved.
-    </footer>
+<footer>
+    &copy; 2024 ExpressivityArena. All rights reserved.
+</footer>
 
 </body>
 </html>
